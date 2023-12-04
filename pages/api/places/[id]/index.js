@@ -10,28 +10,43 @@ export default async function handler(request, response) {
   }
 
   if (request.method === "GET") {
-    const place = await Place.findById(id);
+    try {
+      const place = await Place.findById(id);
 
-    if (!place) {
-      return response.status(404).json({ status: "Not found" });
+      if (!place) {
+        return response.status(404).json({ status: "Not found" });
+      }
+
+      response.status(200).json(place);
+    } catch (error) {
+      console.error(error);
+      response.status(500).json({ status: "Internal Server Error" });
     }
-
-    response.status(200).json(place);
   }
 
   if (request.method === "PATCH") {
-    await Place.findByIdAndUpdate(id, {
-      $set: request.body,
-    });
+    try {
+      await Place.findByIdAndUpdate(id, {
+        $set: request.body,
+      });
 
-    response.status(200).json({ status: `Place with ${id} updated!` });
+      response.status(200).json({ status: `Place ${id} updated!` });
+    } catch (error) {
+      console.error(error);
+      response.status(500).json({ status: "Internal Server Error" });
+    }
   }
 
   if (request.method === "DELETE") {
-    await Place.findByIdAndDelete(id);
+    try {
+      await Place.findByIdAndDelete(id);
 
-    response
-      .status(200)
-      .json({ status: `Place with ${id} successfully deleted.` });
+      response
+        .status(200)
+        .json({ status: `Place ${id} successfully deleted.` });
+    } catch (error) {
+      console.error(error);
+      response.status(500).json({ status: "Internal Server Error" });
+    }
   }
 }
